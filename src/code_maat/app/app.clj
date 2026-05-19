@@ -26,7 +26,8 @@
             [code-maat.app.team-mapper :as team-mapper]
             [code-maat.analysis.communication :as communication]
             [code-maat.analysis.commit-messages :as commits]
-            [code-maat.analysis.code-age :as age]))
+            [code-maat.analysis.code-age :as age]
+            [code-maat.analysis.cohesion :as cohesion]))
 
 ;;; Principles:
 ;;;
@@ -70,7 +71,8 @@
    "fragmentation" effort/as-entity-fragmentation
    "communication" communication/by-shared-entities
    "messages" commits/by-word-frequency
-   "age" age/by-age})
+   "age" age/by-age
+   "cohesion" cohesion/by-cohesion})
 
 (defn analysis-names
   []
