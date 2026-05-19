@@ -44,7 +44,7 @@ You can also build code-maat as a Docker image:
 
       docker build -t code-maat-app .
 
-If this fails on your Apple Silicon change "clojure:alpine" to "clojure:latest" in the first line of the Dockerfile.
+The Dockerfile uses `clojure:latest`. If you encounter platform issues, ensure you are using a recent Docker version.
 
 Finally, if you want to use Code Maat as a library, then add the following line to your leiningen dependencies:
 
@@ -132,7 +132,7 @@ When invoked with `-h`, Code Maat prints its usage:
              Options:
                -l, --log LOG                                         Log file with input data
                -c, --version-control VCS                             Input vcs module type: supports svn, git, git2, hg, p4, or tfs
-               -a, --analysis ANALYSIS                      authors  The analysis to run (abs-churn, age, author-churn, authors, communication, coupling, entity-churn, entity-effort, entity-ownership, fragmentation, identity, main-dev, main-dev-by-revs, messages, refactoring-main-dev, revisions, soc, summary)
+               -a, --analysis ANALYSIS                      authors  The analysis to run (abs-churn, age, author-churn, authors, cohesion, communication, coupling, entity-churn, entity-effort, entity-ownership, fragmentation, identity, main-dev, main-dev-by-revs, messages, refactoring-main-dev, revisions, soc, summary)
               --input-encoding INPUT-ENCODING                        Specify an encoding other than UTF-8 for the log file
                -r, --rows ROWS                                       Max rows in output
                -g, --group GROUP                                     A file with a pre-defined set of layers. The data will be aggregated according to the group of layers.
@@ -207,6 +207,32 @@ Since there's probably no reason they should change together, the analysis point
 
 *Advanced*: the coupling analysis also supports `--verbose-results`. In verbose mode, the coupling analysis also includes the number of revisions for each coupled entity together
 with the number of shared revisions. The main use cases for this option are a) build custom filters to reduce noise, or b) research studies.
+
+#### Mining cohesion
+
+Cohesion is the complement of coupling. Where coupling measures which modules change *together across* architectural boundaries, cohesion measures how often a component's changes are *self-contained* — that is, revisions that only touch files within the same component.
+
+High cohesion is a sign of a well-defined component with a single, clear responsibility. Low cohesion suggests that a component is frequently modified alongside files in other components, which may indicate a design that does not reflect the actual change patterns of the system.
+
+The cohesion analysis is invoked with the `-a cohesion` option and is most useful combined with the `-g` flag to define architectural boundaries:
+
+              java -jar code-maat-1.0.4-standalone.jar -l logfile.log -c git2 -a cohesion -g layers.txt
+
+The resulting output is on CSV format:
+
+              entity,    revisions, internal, cohesion
+              Payments,         42,        8,       19
+              Auth,             30,       12,       40
+              Core,             55,       44,       80
+              ...
+
+The columns are:
+- `entity` — the component name (as defined in your group/layer file)
+- `revisions` — total number of revisions in which any file in this component was changed
+- `internal` — number of those revisions where *only* files within this component changed
+- `cohesion` — `internal / revisions` expressed as a percentage (0–100)
+
+Results are sorted ascending by cohesion so the least cohesive components (the most likely refactoring candidates) appear first.
 
 ### Calculate code age
 

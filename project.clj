@@ -20,4 +20,5 @@
                  [instaparse "1.4.1"]]
   :main code-maat.cmd-line
   :aot [code-maat.cmd-line]
-  :jvm-opts ["-Xmx4g" "-Djava.awt.headless=true" "-Xss512M"])
+  :jvm-opts ["-Xmx4g" "-Djava.awt.headless=true" "-Xss512M"
+             "--add-opens" "java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED"])

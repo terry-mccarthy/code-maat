@@ -1,0 +1,12 @@
+FROM clojure:latest
+
+ARG dest=/usr/src/code-maat
+RUN mkdir -p $dest
+WORKDIR $dest
+
+COPY project.clj $dest
+RUN lein deps
+
+COPY . $dest
+
+CMD ["lein", "test"]
